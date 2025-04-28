@@ -19,8 +19,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ToDo.Application\ToDo.Application.csproj" />
-      <ProjectReference Include="..\ToDo.Infrastructure\ToDo.Infrastructure.csproj" />
+      <ProjectReference Include="..\ToDoApp.Application\ToDoApp.Application.csproj" />
+      <ProjectReference Include="..\ToDoApp.Infrastructure\ToDoApp.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
