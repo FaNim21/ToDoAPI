@@ -1,17 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ToDoApp.Domain.Entities;
 using ToDoApp.Infrastructure.Data;
+using ToDoApp.Infrastructure.Interfaces;
 
 namespace ToDoApp.Infrastructure.Repositories;
 
 public class ToDoRepository : IToDoRepository
 {
     private readonly DatabaseContext _dbContext;
+    private readonly IDateProvider _dateProvider;
 
     
-    public ToDoRepository(DatabaseContext dbContext)
+    public ToDoRepository(DatabaseContext dbContext, IDateProvider dateProvider)
     {
-        this._dbContext = dbContext;
+        _dbContext = dbContext;
+        _dateProvider = dateProvider;
     }
 
     public async Task<ToDo> Create(DateTime expiry, string title, string description)
@@ -59,7 +62,7 @@ public class ToDoRepository : IToDoRepository
 
     public async Task<List<ToDo>?> GetAllIncomingToday()
     {
-        var today = DateTime.Today;
+        var today = _dateProvider.Today;
 
         return await _dbContext.ToDos
             .Where(todo => todo.Expiry >= today && todo.Expiry < today.AddDays(1)).ToListAsync();
@@ -67,7 +70,7 @@ public class ToDoRepository : IToDoRepository
 
     public async Task<List<ToDo>?> GetAllIncomingTomorrow()
     {
-        var tomorrow = DateTime.Today.AddDays(1);
+        var tomorrow = _dateProvider.Today.AddDays(1);
 
         return await _dbContext.ToDos
             .Where(todo => todo.Expiry >= tomorrow && todo.Expiry < tomorrow.AddDays(1)).ToListAsync();
@@ -75,7 +78,7 @@ public class ToDoRepository : IToDoRepository
 
     public async Task<List<ToDo>?> GetAllIncomingCurrentWeek()
     {
-        var today = DateTime.Today;
+        var today = _dateProvider.Today;
         int daysSinceMonday = today.DayOfWeek - DayOfWeek.Monday;
         if (daysSinceMonday < 0) daysSinceMonday += 7;
         var monday = today.AddDays(-daysSinceMonday);

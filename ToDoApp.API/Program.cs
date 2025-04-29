@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ToDoApp.Application.Services;
 using ToDoApp.Infrastructure.Data;
+using ToDoApp.Infrastructure.Interfaces;
 using ToDoApp.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 
 builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
 builder.Services.AddScoped<IToDoService, ToDoService>();
+
+builder.Services.AddSingleton<IDateProvider, SystemDateProvider>();
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
