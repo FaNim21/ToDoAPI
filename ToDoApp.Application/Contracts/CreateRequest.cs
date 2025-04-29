@@ -1,3 +1,5 @@
-﻿namespace ToDoApp.Application.Contracts;
+﻿using System.ComponentModel.DataAnnotations;
 
-public record CreateRequest(DateTime Expiry, string Title, string Description);
+namespace ToDoApp.Application.Contracts;
+
+public record CreateRequest([Required] DateTime Expiry, [Required, StringLength(100)] string Title, [Required, StringLength(240)] string Description);

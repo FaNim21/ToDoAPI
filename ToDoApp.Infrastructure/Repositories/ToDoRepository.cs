@@ -29,16 +29,14 @@ public class ToDoRepository : IToDoRepository
         return todo;
     }
 
-    public async Task<ToDo?> Get(int id)
+    public async Task<ToDo?> GetById(int id)
     {
-        return await _dbContext.ToDos.Where(todo => todo.Id == id).FirstOrDefaultAsync();
+        return await _dbContext.ToDos
+            .Where(todo => todo.Id == id).FirstOrDefaultAsync();
     }
 
-    public async Task<bool> Update(int id, DateTime expiry, string title, string description, int percentCompletion, bool isCompleted)
+    public async Task Update(ToDo todo, DateTime expiry, string title, string description, int percentCompletion, bool isCompleted)
     {
-        var todo = await _dbContext.ToDos.Where(todo => todo.Id == id).FirstOrDefaultAsync();
-        if (todo == null) return false;
-        
         todo.Expiry = expiry;
         todo.Title = title;
         todo.Description = description;
@@ -46,18 +44,12 @@ public class ToDoRepository : IToDoRepository
         todo.IsCompleted = isCompleted;
         
         await _dbContext.SaveChangesAsync();
-        return true;
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task Delete(ToDo todo)
     {
-        var todo = await _dbContext.ToDos.Where(todo => todo.Id == id).FirstOrDefaultAsync();
-        if (todo == null) return false;
-
         _dbContext.ToDos.Remove(todo);
-        
         await _dbContext.SaveChangesAsync();
-        return true;
     }
 
     public async Task<List<ToDo>?> GetAll()
@@ -69,45 +61,39 @@ public class ToDoRepository : IToDoRepository
     {
         var today = DateTime.Today;
 
-        return await _dbContext.ToDos.Where(todo => todo.Expiry >= today && todo.Expiry < today.AddDays(1)).ToListAsync();
+        return await _dbContext.ToDos
+            .Where(todo => todo.Expiry >= today && todo.Expiry < today.AddDays(1)).ToListAsync();
     }
 
     public async Task<List<ToDo>?> GetAllIncomingTomorrow()
     {
         var tomorrow = DateTime.Today.AddDays(1);
 
-        return await _dbContext.ToDos.Where(todo => todo.Expiry >= tomorrow && todo.Expiry < tomorrow.AddDays(1)).ToListAsync();
+        return await _dbContext.ToDos
+            .Where(todo => todo.Expiry >= tomorrow && todo.Expiry < tomorrow.AddDays(1)).ToListAsync();
     }
 
-    public async Task<List<ToDo>?> GetAllIncomingWeek()
+    public async Task<List<ToDo>?> GetAllIncomingCurrentWeek()
     {
         var today = DateTime.Today;
         int daysSinceMonday = today.DayOfWeek - DayOfWeek.Monday;
         if (daysSinceMonday < 0) daysSinceMonday += 7;
         var monday = today.AddDays(-daysSinceMonday);
 
-        return await _dbContext.ToDos.Where(todo => todo.Expiry >= monday && todo.Expiry < monday.AddDays(7)).ToListAsync();
+        return await _dbContext.ToDos
+            .Where(todo => todo.Expiry >= monday && todo.Expiry < monday.AddDays(7))
+            .OrderBy(todo => todo.Expiry).ToListAsync();
     }
 
-    public async Task<bool> SetPercentage(int id, int percentage)
+    public async Task SetPercentage(ToDo todo, int percentage)
     {
-        var todo = await _dbContext.ToDos.Where(todo => todo.Id == id).FirstOrDefaultAsync();
-        if (todo == null) return false;
-
         todo.PercentCompletion = percentage;
-    
         await _dbContext.SaveChangesAsync();
-        return true;
     }
 
-    public async Task<bool> MarkAsDone(int id)
+    public async Task MarkAsDone(ToDo todo)
     {
-        var todo = await _dbContext.ToDos.Where(todo => todo.Id == id).FirstOrDefaultAsync();
-        if (todo == null) return false;
-
         todo.IsCompleted = true;
-
         await _dbContext.SaveChangesAsync();
-        return true;
     }
 }
